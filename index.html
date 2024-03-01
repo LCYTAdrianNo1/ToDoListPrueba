@@ -22,6 +22,9 @@
             list-style: none;
             margin-bottom: 5px;
         }
+        #completed-tasks {
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
@@ -33,6 +36,11 @@
         <input type="text" id="task-input" class="form-control" placeholder="Enter task" />
         <ul id="task" class="list-group">
         </ul>
+        <div id="completed-tasks">
+            <h3 class="title">Tareas Realizadas</h3>
+            <ul id="completed-task-list" class="list-group">
+            </ul>
+        </div>
     </div>
 
     <footer class="bg-dark text-white p-3 text-center">
@@ -44,26 +52,49 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             let tasks = []
+            let completedTasks = []
             const ul = document.getElementById('task')
+            const completedUl = document.getElementById('completed-task-list')
+            
             const renderTasks = (value) => {
                 const newLi = document.createElement('li');
                 newLi.textContent = value;
+                
                 const deleteBtn = document.createElement('span')
                 deleteBtn.textContent = "✔"
                 deleteBtn.addEventListener("dblclick", (e) => {
                     e.target.parentElement.remove()
                     tasks.splice(tasks.indexOf(value), 1)
+                    completedTasks.push(value)
                     localStorage.setItem("tasks", JSON.stringify(tasks))
+                    localStorage.setItem("completedTasks", JSON.stringify(completedTasks))
+                    renderCompletedTasks(value)
                 })
+                
                 newLi.appendChild(deleteBtn)
                 ul.appendChild(newLi)
             }
+
+            const renderCompletedTasks = (value) => {
+                const newLi = document.createElement('li');
+                newLi.textContent = value;
+                completedUl.appendChild(newLi);
+            }
+
             if (localStorage.getItem("tasks")) {
                 tasks = JSON.parse(localStorage.getItem("tasks"))
                 tasks.forEach((task) => {
                     renderTasks(task)
                 })
             }
+
+            if (localStorage.getItem("completedTasks")) {
+                completedTasks = JSON.parse(localStorage.getItem("completedTasks"))
+                completedTasks.forEach((task) => {
+                    renderCompletedTasks(task)
+                })
+            }
+
             document.addEventListener("keyup", (e) => {
                 if (e.key === "Enter") {
                     let value = e.target.value;
